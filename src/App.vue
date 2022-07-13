@@ -1,17 +1,28 @@
 <template>
   <div>
-    <div>黑马头条</div>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 export default {
+  name: 'App',
+
   data () {
-    return {
-    }
-  }
+    return {}
+  },
+  created () {},
+  mounted () {},
+
+  methods: {}
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+.login {
+  width: 694px;
+  height: 88px;
+  background-color: #6db4fb;
+  border-radius: 10px;
+}
 </style>
