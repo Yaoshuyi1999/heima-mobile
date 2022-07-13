@@ -17,7 +17,7 @@
         :rules="[{ required: true, message: '请输入手机号' }]"
       >
         <template #left-icon>
-          <span class="iconfont icon-shouji"></span>
+          <span class="toutiao toutiao-shouji"></span>
         </template>
       </van-field>
       <van-field
@@ -28,7 +28,7 @@
         :rules="[{ required: true, message: '请输入验证码' }]"
       >
         <template #left-icon>
-          <span class="iconfont icon-yanzhengma"></span>
+          <span class="toutiao toutiao-yanzhengma"></span>
         </template>
         <template #button>
           <van-button
@@ -88,7 +88,7 @@ export default {
 
 // 表单样式
 .form {
-  .iconfont {
+  .toutiao {
     font-size: 37px;
     color: #666;
   }
