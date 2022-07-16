@@ -95,10 +95,10 @@ export default {
         const res = await login(this.mobile, this.code)
         // 存储token
         this.$store.commit('setUser', res.data.data)
-        console.log(res)
+        // console.log(res)
         // 提示成功
         this.$toast.success('登录成功')
-        this.$router.push('/')
+        this.$router.push('/profile')
       } catch (error) {
         // 拿到后端状态码
         const status = error.response.status
