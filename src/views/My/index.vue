@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { getUserInfo } from '@/api/user'
+import { getUserInfo } from '@/api'
 export default {
   data() {
     return {

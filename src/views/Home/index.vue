@@ -8,32 +8,33 @@
     </van-nav-bar>
     <!-- tabs选项卡 -->
     <van-tabs v-model="active" swipeable>
-      <van-tab
-        v-for="item in myChannels"
-        :key="item.id"
-        :title="item.name"
-      >
-      <ArticleList :id="item.id"></ArticleList>
+      <van-tab v-for="item in myChannels" :key="item.id" :title="item.name">
+        <!-- 文章列表 -->
+        <ArticleList :id="item.id"></ArticleList>
       </van-tab>
+      <!-- 更多按钮 -->
+      <span class="toutiao toutiao-gengduo" @click="showPopup"></span>
     </van-tabs>
-    <!-- 更多按钮 -->
-    <span class="toutiao toutiao-gengduo"></span>
+    <!-- 弹框 -->
+    <EditChannelPopup ref="popup" :myChannels="myChannels"></EditChannelPopup>
   </div>
 </template>
 
 <script>
-import { getMyChannels } from '@/api/channel'
+import EditChannelPopup from './component/EditChannelPopup.vue'
+import { getMyChannels } from '@/api'
 import ArticleList from './component/ArticlList.vue'
 export default {
   components: {
-    ArticleList
+    ArticleList,
+    EditChannelPopup
   },
   created() {
     this.getMyChannels()
   },
   data() {
     return {
-      active: 2,
+      active: 0,
       myChannels: {}
     }
   },
@@ -48,6 +49,9 @@ export default {
       } catch (err) {
         this.$toast.fail('请重新获取频道列表')
       }
+    },
+    showPopup() {
+      this.$refs.popup.isShow = true
     }
   }
 }
@@ -103,6 +107,7 @@ export default {
 
 /* 字体图标 */
 .toutiao-gengduo {
+  z-index: 999;
   position: absolute;
   top: 0;
   right: 0;
@@ -124,5 +129,26 @@ export default {
     width: 1px;
     background-image: url('~@/assets/images/gradient-gray-line.png');
   }
+}
+// 头部固定的样式
+.navbar {
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+:deep(.van-tabs__wrap) {
+  position: sticky;
+  top: 92px;
+  left: 0;
+  z-index: 99;
+}
+.toutiao-gengduo {
+  position: fixed;
+  top: 92px;
+}
+
+:deep(.van-tabs__content) {
+  max-height: calc(100vh - 92px - 82px - 100px);
+  overflow: auto;
 }
 </style>

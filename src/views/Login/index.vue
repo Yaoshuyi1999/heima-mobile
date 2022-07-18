@@ -61,7 +61,7 @@
 
 <script>
 // 引入api
-import { login, sendCode } from '@/api/user'
+import { login, sendCode } from '@/api'
 // 引入校验规则
 import { mobileRules, codeRules } from './rules'
 export default {
