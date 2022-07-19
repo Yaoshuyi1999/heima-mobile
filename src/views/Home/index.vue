@@ -16,18 +16,35 @@
       <span class="toutiao toutiao-gengduo" @click="showPopup"></span>
     </van-tabs>
     <!-- 弹框 -->
-    <EditChannelPopup ref="popup" :myChannels="myChannels"></EditChannelPopup>
+    <EditChannelPopup
+      ref="popup"
+      :myChannels="myChannels"
+      @del-mychannel="delMychannel"
+      @change-active="changeActive"
+      @add-mychannel="addMyChannel"
+    ></EditChannelPopup>
   </div>
 </template>
 
 <script>
 import EditChannelPopup from './component/EditChannelPopup.vue'
-import { getMyChannels } from '@/api'
+import {
+  getMyChannels,
+  getMyChannelsByLocal,
+  setMyChannelToLocal,
+  delMyChannel,
+  addMyChannel
+} from '@/api'
 import ArticleList from './component/ArticlList.vue'
 export default {
   components: {
     ArticleList,
     EditChannelPopup
+  },
+  computed: {
+    isLogin() {
+      return !!this.$store.state.user.token
+    }
   },
   created() {
     this.getMyChannels()
@@ -35,16 +52,66 @@ export default {
   data() {
     return {
       active: 0,
-      myChannels: {}
+      myChannels: []
     }
   },
   methods: {
+    async addMyChannel(channel) {
+      this.myChannels.push(channel)
+      if (!this.isLogin) {
+        setMyChannelToLocal(this.myChannels)
+      } else {
+        // 如果你是登录状态
+        try {
+          await addMyChannel(channel.id, this.myChannels.length)
+        } catch (error) {
+          return this.$toast.fail('添加频道失败')
+        }
+      }
+      this.$toast.success('添加频道成功')
+    },
+    // 删除我的频道
+    async delMychannel(id) {
+      // 删除我的频道
+      this.myChannels = this.myChannels.filter((item) => item.id !== id)
+      if (!this.isLogin) {
+        setMyChannelToLocal(this.myChannels)
+      } else {
+        // 如果你是登录状态
+        // 发送接口，删除频道
+        try {
+          await delMyChannel(id)
+        } catch (error) {
+          return this.$toast.fail('删除用户频道失败')
+        }
+      }
+      this.$toast.success('删除用户频道成功')
+    },
+    changeActive(active) {
+      this.active = active
+    },
+    // 获取所有频道列表并处理数据
     async getMyChannels() {
       try {
-        // const { data } = await getMyChannels()
-        // this.myChannels = data.data.channels
-        const res = await getMyChannels()
-        this.myChannels = res.data.data.channels
+        // const res = await getMyChannels()
+        // this.myChannels = res.data.data.channels
+        if (!this.isLogin) {
+          // 如果你是离线状态
+          // 如果本地存储有数据,直接用本地存储的数据
+          // 如果本地存储没数据,发送请求获取默认频道数据
+          const myChannels = getMyChannelsByLocal()
+          if (myChannels) {
+            this.myChannels = myChannels
+          } else {
+            const { data } = await getMyChannels()
+            this.myChannels = data.data.channels
+          }
+        } else {
+          // 如果你是登录状态
+          // 发请求获取的
+          const { data } = await getMyChannels()
+          this.myChannels = data.data.channels
+        }
         // console.log(res)
       } catch (err) {
         this.$toast.fail('请重新获取频道列表')

@@ -11,17 +11,29 @@
       <div class="my-channel">
         <!-- 我的频道标题 -->
         <van-cell title="我的频道">
-          <van-button size="small" round class="edit-btn">编辑</van-button>
+          <van-button
+            size="small"
+            round
+            class="edit-btn"
+            @click="isEdit = !isEdit"
+            >{{ isEdit ? '完成' : '编辑' }}</van-button
+          >
         </van-cell>
 
         <!--我的频道-->
+        <!-- v-show是通过display控制的-->
+        <!-- v-if直接宣染-->
         <van-grid :border="false" gutter="10px">
           <van-grid-item
-            v-for="item in myChannels"
+            v-for="(item, index) in myChannels"
             :key="item.id"
             :text="item.name"
+            :class="{ 'active-channel': item.name === '推荐' }"
+            @click="onClickMyChannel(item, index)"
           >
-            <template #icon> <van-icon name="cross" /> </template>
+            <template #icon>
+              <van-icon name="cross" v-show="isEdit && item.name !== '推荐'" />
+            </template>
           </van-grid-item>
         </van-grid>
       </div>
@@ -38,6 +50,7 @@
             :key="item.id"
             :text="item.name"
             icon="plus"
+            @click="addMyChannel(item)"
           >
           </van-grid-item>
         </van-grid>
@@ -62,7 +75,8 @@ export default {
   data() {
     return {
       isShow: false,
-      allChannels: []
+      allChannels: [],
+      isEdit: false
     }
   },
   methods: {
@@ -71,6 +85,25 @@ export default {
       const { data } = await getAllChannels()
       //   console.log(data)
       this.allChannels = data.data.channels
+    },
+    // 点击我的频道
+    // props 什么时候不能修改?基本数据类型,完全不能修改
+    // 复杂数据类型: arr,obj. vue也是不建议修改的
+    onClickMyChannel(channel, index) {
+      // 边缘情况的判断
+      if (this.isEdit && channel.name !== '推荐') {
+        // 删除
+        return this.$emit('del-mychannel', channel.id)
+      }
+      if (!this.isEdit) {
+        // 切换
+        this.isShow = false
+        this.$emit('change-active', index)
+      }
+    },
+    // 添加频道
+    addMyChannel(myChannel) {
+      this.$emit('add-mychannel', { ...myChannel })
     }
   },
   computed: {
@@ -94,6 +127,12 @@ export default {
 
 <style scoped lang="less">
 .popupMain {
+  // 高亮频道
+  .active-channel {
+    :deep(.van-grid-item__text) {
+      color: red;
+    }
+  }
   padding-top: 100px;
   //按钮的样式
   .edit-btn {
@@ -138,7 +177,7 @@ export default {
     // 推荐频道加号样式
     :deep(.van-grid-item__content) {
       flex-direction: row;
-      padding-left: 10px;
+      padding-left: -15px;
 
       .van-grid-item__icon {
         font-size: 0.4rem;
