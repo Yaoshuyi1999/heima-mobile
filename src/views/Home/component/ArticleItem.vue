@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div @click="articlesDate(articleInfo.art_id)">
     <!-- 渲染无图片 -->
     <van-cell
       v-if="articleInfo.cover.type === 0"
@@ -27,7 +27,7 @@
       <template #label>
         <div>
           <van-image
-            v-for="(item,key) in articleInfo.cover.images"
+            v-for="(item, key) in articleInfo.cover.images"
             :key="key"
             width="3rem"
             height="2rem"
@@ -54,6 +54,19 @@ export default {
       const art = this.articleInfo
       const relativeTime = dayjs(art.pubdate).fromNow()
       return `${this.articleInfo.aut_name} ${this.articleInfo.comm_count}评论 ${relativeTime}`
+    }
+  },
+  methods: {
+    // 点击跳转详情页
+    articlesDate(id) {
+      console.log(id)
+      this.$router.push({
+        // path: `/detail/${id}`
+        name: 'detail',
+        query: {
+          id: id
+        }
+      })
     }
   }
 }
