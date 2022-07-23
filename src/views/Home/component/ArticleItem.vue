@@ -59,7 +59,7 @@ export default {
   methods: {
     // 点击跳转详情页
     articlesDate(id) {
-      console.log(id)
+      // console.log(id)
       this.$router.push({
         // path: `/detail/${id}`
         name: 'detail',

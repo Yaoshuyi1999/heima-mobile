@@ -24,6 +24,7 @@ export const delMyChannel = (target) => {
 }
 
 // id, seq是数字型
+// 添加频道列表
 export const addMyChannel = (id, seq) => {
   return request({
     url: '/v1_0/user/channels',

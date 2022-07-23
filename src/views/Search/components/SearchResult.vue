@@ -54,6 +54,7 @@ export default {
         console.log(error)
       }
     },
+    // 加载状态
     async onLoad() {
       this.page++
       const res = await this.getSearch()

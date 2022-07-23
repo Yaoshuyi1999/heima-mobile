@@ -7,3 +7,5 @@ export * from './channel'
 export * from './search'
 
 export * from './article'
+
+export * from './operation'

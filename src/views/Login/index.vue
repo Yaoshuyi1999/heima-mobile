@@ -81,7 +81,7 @@ export default {
 
   methods: {
     backToPrePage() {
-      this.$router.back()
+      this.$router.go(-1)
     },
     async login() {
       // #region

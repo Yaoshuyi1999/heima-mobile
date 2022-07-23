@@ -28,6 +28,10 @@ const routes = [
       {
         path: '/profile',
         component: () => import('@/views/My')
+      },
+      {
+        path: '/user',
+        component: () => import('@/views/User')
       }
     ]
   },
@@ -36,7 +40,7 @@ const routes = [
     component: () => import('@/views/Search')
   },
   {
-    path: '/detail/:id',
+    path: '/detail',
     name: 'detail',
     component: () => import('@/views/detail')
   }

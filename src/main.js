@@ -13,6 +13,7 @@ import '@/assets/fonts/iconfont.css'
 // 引入flexble
 import 'amfe-flexible/index.min.js'
 
+// 代码高光
 import hljs from 'highlight.js'
 import '../node_modules/highlight.js/styles/default.css'
 
