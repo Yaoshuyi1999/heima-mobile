@@ -20,6 +20,7 @@
             :name="isLiking ? 'good-job' : 'good-job-o'"
           />
           <span class="custom-title">赞</span>
+          <span>{{ like_count === 0 ? '' : like_count }}</span>
         </div>
       </div>
       <!-- 中间 -->
@@ -60,7 +61,8 @@ export default {
       isLiking: this.getCommentItem.is_liking,
       isReplyShow: false,
       getReplyList: [],
-      replyCount: 0
+      replyCount: 0,
+      like_count: this.getCommentItem.like_count
       // last: ''
     }
   },
@@ -96,7 +98,7 @@ export default {
         this.replyCount = res.data.data.total_count
         // console.log(this.getReplyList, 1)
         // console.log(this.last)
-        // console.log(res)
+        console.log(res)
         // return res.data.data.results
       } catch (err) {
         console.log(err)
@@ -108,9 +110,11 @@ export default {
         if (this.isLiking) {
           await removeLikeCall(comId)
           this.$toast.success('取消点赞')
+          this.like_count = this.like_count - 1
         } else {
           await addLikeCall(comId)
           this.$toast.success('点赞成功')
+          this.like_count = this.like_count + 1
         }
 
         this.isLiking = !this.isLiking

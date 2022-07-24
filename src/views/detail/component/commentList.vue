@@ -45,7 +45,8 @@ export default {
       ReplyShow: false,
       ReplyIndex: 0,
       end: '',
-      replyCount: 0
+      replyCount: 0,
+      like_count: 0
     }
   },
   props: {
@@ -89,6 +90,7 @@ export default {
         })
         this.last = res.data.data.last_id
         this.end = res.data.data.end_id
+        // this.like_count=res.data.data.results.like_count
         // console.log(this.last)
         // console.log(res)
         return res.data.data.results
