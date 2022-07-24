@@ -39,7 +39,7 @@
       <!-- 正文结束 -->
       <van-divider class="end">正文结束</van-divider>
       <!-- 评论区域 -->
-      <CommentList :getArticleInfoList="getArticleInfoList"></CommentList>
+      <Comment :getArticleInfoList="getArticleInfoList"></Comment>
     </div>
     <!-- 底部导航 -->
     <Foot :getArticleInfoList="getArticleInfoList"></Foot>
@@ -50,7 +50,7 @@
 // 引入插件的
 import Follow from './component/follow.vue'
 import Foot from './component/foot.vue'
-import CommentList from './component/commentList.vue'
+import Comment from './component/comment.vue'
 // 引入几个组件插件的
 import { ImagePreview } from 'vant'
 import dayjs from '@/utils/dayjs'
@@ -63,7 +63,7 @@ export default {
   },
   components: {
     Follow,
-    CommentList,
+    Comment,
     Foot
   },
   data() {

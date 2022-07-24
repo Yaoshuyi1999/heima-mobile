@@ -1,110 +1,88 @@
 <template>
-  <div class="call">
-    <!-- 头部 -->
-    <div class="head">
-      <van-nav-bar :title="title" />
-    </div>
-    <!-- 原来的 -->
-    <van-cell>
-      <!-- 左侧图标，也就是头像 -->
-      <template #icon>
-        <van-image round width="36px" height="36px" :src="item.aut_photo" />
-      </template>
-      <!-- 左侧内容，也就是信息内容 -->
-      <template #title>
-        <div class="top">
-          {{ item.aut_name }}
-          <div class="right">
-            <van-icon name="good-job-o" />
-            <span class="custom-title">赞</span>
-          </div>
+  <van-cell class="comment">
+    <!-- 左侧图标，也就是头像 -->
+    <template #icon>
+      <van-image
+        round
+        width="36px"
+        height="36px"
+        :src="getCommentItem.aut_photo"
+      />
+    </template>
+    <!-- 左侧内容，也就是信息内容 -->
+    <template #title>
+      <!-- 上 -->
+      <div class="top">
+        {{ getCommentItem.aut_name }}
+        <div class="right" @click="loveFn(getCommentItem.com_id)">
+          <van-icon
+            :color="isLiking ? '#1989fa' : ''"
+            :name="isLiking ? 'good-job' : 'good-job-o'"
+          />
+          <span class="custom-title">赞</span>
         </div>
-        <div class="mid">{{ item.content }}</div>
-        <div class="bottom">
-          {{ item.pubdate | articleDesc }}
-          <van-button size="mini" round type="default" class="reply-btn">
-            回复 {{ item.reply_count }}
-          </van-button>
-        </div>
-      </template>
-    </van-cell>
-    <!-- 全部回复 -->
-    <div class="all-replay">
-      <van-cell title="全部回复" />
-    </div>
-    <!-- 回复的 -->
-    <van-cell>
-      <template #icon>
-        <van-image round width="36px" height="36px" :src="item.aut_photo" />
-      </template>
-      <template #title>
-        <div class="top">
-          {{ item.aut_name }}
-          <div class="right">
-            <van-icon name="good-job-o" />
-            <span class="custom-title">赞</span>
-          </div>
-        </div>
-        <div class="mid">{{ item.content }}</div>
-        <div class="bottom">
-          {{ item.pubdate | articleDesc }}
-          <van-button size="mini" round type="default" class="reply-btn">
-            回复 0
-          </van-button>
-        </div>
-      </template>
-    </van-cell>
-    <van-cell v-for="(item, index) in getCommentsShow" :key="index">
-      <!-- 左侧图标，也就是头像 -->
-      <template #icon>
-        <van-image round width="36px" height="36px" :src="item.aut_photo" />
-      </template>
-      <!-- 左侧内容，也就是信息内容 -->
-      <template #title>
-        <div class="top">
-          {{ item.aut_name }}
-          <div class="right">
-            <van-icon name="good-job-o" />
-            <span class="custom-title">赞</span>
-          </div>
-        </div>
-        <div class="mid">{{ item.content }}</div>
-        <div class="bottom">
-          {{ item.pubdate | articleDesc }}
-          <van-button size="mini" round type="default" class="reply-btn">
-            回复 {{ item.reply_count }}
-          </van-button>
-        </div>
-      </template>
-    </van-cell>
-    <!-- 评论按钮 -->
-    <div class="btn-reply">
-      <van-button size="large" round>评论</van-button>
-    </div>
-  </div>
+      </div>
+      <!-- 中间 -->
+      <div class="mid">{{ getCommentItem.content }}</div>
+      <!-- 下面 -->
+      <div class="bottom">
+        {{ getCommentItem.pubdate | articleDesc }}
+        <van-button
+          size="mini"
+          round
+          type="default"
+          class="reply-btn"
+          @click="isReplyShow = true"
+        >
+          回复 {{ getCommentItem.reply_count }}
+        </van-button>
+        <PopReply :isReplyShow="isReplyShow" :commentItem='getCommentItem'></PopReply>
+      </div>
+    </template>
+  </van-cell>
 </template>
 
 <script>
-// import { getComments } from '@/api'
 import dayjs from '@/utils/dayjs'
+import { addLikeCall, removeLikeCall } from '@/api'
+import PopReply from './popReply.vue'
 export default {
+  props: {
+    getCommentItem: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data() {
     return {
-      title: '暂无回复',
-      loading: false,
-      finished: false
+      isLiking: this.getCommentItem.is_liking,
+      isReplyShow: false
     }
   },
-  props: {
-    item: {
-      type: Object,
-      required: true
-    },
-    getCommentsShow: {
-      type: Array,
-      required: true
+  components: {
+    PopReply
+  },
+  methods: {
+    // 评论点赞
+    async loveFn(comId) {
+      try {
+        if (this.isLiking) {
+          await removeLikeCall(comId)
+          this.$toast.success('取消点赞')
+        } else {
+          await addLikeCall(comId)
+          this.$toast.success('点赞成功')
+        }
+
+        this.isLiking = !this.isLiking
+        // this.$forceUpdate()
+        // this.$router.go(0)
+      } catch (err) {
+        this.$toast('操作失败，请重试')
+      }
     }
   },
+  // 过滤器处理时间
   filters: {
     articleDesc(art) {
       const relativeTime = dayjs(art).fromNow()
@@ -115,7 +93,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.call {
+.comment {
   .van-image {
     margin-right: 20px;
   }
@@ -147,23 +125,6 @@ export default {
       .van-button--mini {
         padding: 3px 30px;
       }
-    }
-  }
-  // 底部评论按钮
-  .btn-reply {
-    width: 100%;
-    height: 100px;
-    background-color: #ff69b4;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    bottom: 0;
-    .van-button {
-      color: #000;
-      width: 640px;
-      height: 80px;
     }
   }
 }

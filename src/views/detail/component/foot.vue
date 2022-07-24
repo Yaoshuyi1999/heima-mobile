@@ -32,7 +32,7 @@
     <div class="right">
       <!-- 评论 -->
       <div class="icon">
-        <div class="num">{{ numReply }}</div>
+        <div class="num">{{ getArticleInfoList.comm_count }}</div>
         <van-icon name="comment-o" />
       </div>
       <!-- 收藏 -->
@@ -98,12 +98,12 @@ export default {
       numReply: 0
     }
   },
-  created() {
-    eventBus.$on('sendNum', (numReply) => {
-      // console.log(numReply + '真的')
-      this.numReply = numReply
-    })
-  },
+  // created() {
+  //   eventBus.$on('sendNum', (numReply) => {
+  //     // console.log(numReply + '真的')
+  //     this.numReply = numReply
+  //   })
+  // },
   methods: {
     // 写评论留言
     leaveWordFn() {
@@ -126,6 +126,7 @@ export default {
         // 跨组件传值，发送方
         eventBus.$emit('send', this.getReleaseList)
         this.$toast.success('发布成功')
+        // 用了非法的方式，直接改变了父组件传的值
         this.getArticleInfoList.comm_count =
           this.getArticleInfoList.comm_count + 1
       } catch (err) {
