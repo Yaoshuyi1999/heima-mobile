@@ -41,3 +41,12 @@ export const getMyProfile = (data) => {
     data
   })
 }
+
+// 编辑用户照片资料
+export const sendEditUserPhoto = (data) => {
+  return request({
+    method: 'PATCH',
+    url: '/v1_0/user/photo',
+    data
+  })
+}

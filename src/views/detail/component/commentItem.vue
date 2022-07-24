@@ -32,11 +32,10 @@
           round
           type="default"
           class="reply-btn"
-          @click="isReplyShow = true"
+          @click="clickPopFn"
         >
           回复 {{ getCommentItem.reply_count }}
         </van-button>
-        <PopReply :isReplyShow="isReplyShow" :commentItem='getCommentItem'></PopReply>
       </div>
     </template>
   </van-cell>
@@ -44,25 +43,65 @@
 
 <script>
 import dayjs from '@/utils/dayjs'
-import { addLikeCall, removeLikeCall } from '@/api'
-import PopReply from './popReply.vue'
+import { addLikeCall, removeLikeCall, getComments } from '@/api'
 export default {
   props: {
     getCommentItem: {
       type: Object,
       default: () => ({})
+    },
+    ind: {
+      type: Number,
+      required: true
     }
   },
   data() {
     return {
       isLiking: this.getCommentItem.is_liking,
-      isReplyShow: false
+      isReplyShow: false,
+      getReplyList: [],
+      replyCount: 0
+      // last: ''
     }
   },
-  components: {
-    PopReply
-  },
   methods: {
+    // 点击回复，弹出回复列表
+    async clickPopFn() {
+      this.isReplyShow = true
+      await this.getReply()
+      // console.log(this.getReplyList, 4)
+      this.$emit(
+        'popFn',
+        this.isReplyShow,
+        this.ind,
+        this.getReplyList,
+        this.replyCount
+      )
+    },
+    // 获取评论的评论列表
+    async getReply() {
+      console.log(1)
+      try {
+        // console.log(this.last)
+        // console.log(this.$route.query.id)
+        const res = await getComments({
+          type: 'c',
+          source: this.getCommentItem.com_id,
+          // offset: this.last,
+          limit: 5
+        })
+        // this.last = res.data.data.last_id
+        // this.end = res.data.data.end_id
+        this.getReplyList = res.data.data.results
+        this.replyCount = res.data.data.total_count
+        // console.log(this.getReplyList, 1)
+        // console.log(this.last)
+        // console.log(res)
+        // return res.data.data.results
+      } catch (err) {
+        console.log(err)
+      }
+    },
     // 评论点赞
     async loveFn(comId) {
       try {
@@ -75,6 +114,7 @@ export default {
         }
 
         this.isLiking = !this.isLiking
+
         // this.$forceUpdate()
         // this.$router.go(0)
       } catch (err) {

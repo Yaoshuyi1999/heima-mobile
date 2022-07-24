@@ -10,17 +10,22 @@
     />
     <!-- 内容 -->
     <van-cell-group class="group">
-      <van-cell title="头像" value="内容" is-link>
-        <template #default>
-          <van-image
-            class="headPic"
-            cover
-            round
-            width="30"
-            height="30"
-            src="https://img.yzcdn.cn/vant/cat.jpeg"
-          />
-        </template>
+      <input
+        type="file"
+        hidden
+        ref="file"
+        accept=".png,.jpg"
+        @change="onFileChange"
+      />
+      <van-cell title="头像" is-link @click="$refs.file.click()">
+        <van-image
+          class="avatar"
+          cover
+          round
+          width="30"
+          height="30"
+          :src="userPhoto"
+        />
       </van-cell>
       <!-- 昵称 -->
       <van-cell
@@ -43,6 +48,14 @@
         @click="isPopBirthday = true"
       />
 
+      <!-- 弹层头像 -->
+      <van-popup v-model="imageShow">
+        <ImagePopup
+          :userImage="userImage"
+          :imageShow.sync="imageShow"
+          :updatePhoto.sync="userPhoto"
+        ></ImagePopup>
+      </van-popup>
       <!-- 弹层昵称 -->
       <van-popup v-model="isPopName" style="height: 100%" position="bottom">
         <van-nav-bar
@@ -88,9 +101,13 @@
 </template>
 
 <script>
+import ImagePopup from './component/imagePopup'
 import dayjs from '@/utils/dayjs'
 import { getUserProfile, getMyProfile } from '@/api'
 export default {
+  components: {
+    ImagePopup
+  },
   data() {
     return {
       userProfile: {},
@@ -101,12 +118,37 @@ export default {
       isPopBirthday: false, // 生日的弹层
       minDate: new Date(1900, 0, 1),
       maxDate: new Date(),
-      currentDate: new Date()
+      currentDate: new Date(),
+      show: false,
+      photo: '',
+      // 头像部分
+      userPhoto: '',
+      status: 0,
+      imageShow: false,
+      userImage: null
     }
   },
   created() {
     this.getUserProfile()
   },
+  // mounted() {
+  //   this.$refs.file.addEventListener('change', (e) => {
+  //     // e.target 触发事件的元素
+  //     // 图片的src能识别什么?
+  //     //  - 图片相对/绝对路径
+  //     //  - base64 DateUrl
+  //     //  - file,blob对象的url
+  //     const file = e.target.files[0]
+  //     // file = URL.createObjectURL(file) // 将file对象转换成图片可识别的url
+  //     const fr = new FileReader()
+  //     fr.readAsDataURL(file)
+
+  //     fr.onload = (e) => {
+  //       this.photo = e.target.result
+  //       this.show = true
+  //     }
+  //   })
+  // },
   methods: {
     // 获取用户的资料
     async getUserProfile() {
@@ -115,12 +157,24 @@ export default {
         const res = await getUserProfile()
         this.userProfile = res.data.data
         this.message = this.userProfile.name
+        this.userPhoto = this.userProfile.photo
         // console.log(res)
       } catch (err) {
         this.$toast.fail('获取信息失败')
       }
     },
     // 提交头像的修改
+    onFileChange() {
+      // 获取文件对象
+      const file = this.$refs.file.files[0]
+      // 基于文章对象获取blob 数据
+      this.userImage = window.URL.createObjectURL(file)
+      // 展示预览图片弹出层
+      this.imageShow = true
+      // file-input 如果选了同一个文件不会触 change 事件
+      // 解决办法就是每次使用完毕,把它的value 清空
+      this.$refs.file.value = ''
+    },
     // 提交昵称的修改
     async popName() {
       try {
@@ -182,5 +236,9 @@ export default {
   .group {
     margin-top: 96px;
   }
+}
+/deep/.cropper-container {
+  width: 750px !important;
+  height: 750px !important;
 }
 </style>

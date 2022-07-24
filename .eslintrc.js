@@ -18,6 +18,8 @@ module.exports = {
     'no-unused-vars': 'off',
     'vue/no-mutating-props': 'off',
     'import/no-absolute-path': 'off',
-    'vue/no-duplicate-attributes': 'off'
+    'vue/no-duplicate-attributes': 'off',
+    'comma-spacing': 'off',
+    'arrow-spacing': 'off'
   }
 }

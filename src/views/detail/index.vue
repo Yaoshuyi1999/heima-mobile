@@ -84,7 +84,7 @@ export default {
         const res = await getArticleInfo(this.$route.query.id)
         // console.log(res)
         this.getArticleInfoList = res.data.data
-        // console.log(this.getArticleInfoList, 1)
+        // console.log(this.getArticleInfoList, 111)
         // 文章内容渲染完成再拿到图片地址
         this.$nextTick(() => {
           this.previewImg()

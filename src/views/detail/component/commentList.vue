@@ -10,25 +10,42 @@
       <CommentItem
         v-for="(item, index) in getCommentsList"
         :key="index"
+        :ind="index"
         :getCommentItem="item"
+        @popFn="popFn"
       ></CommentItem>
+      <PopReply
+        :isReplyShow="ReplyShow"
+        :ReplyIndex="ReplyIndex"
+        :getCommentsList="getCommentsList"
+        :getReplyList="getReplyList"
+        :replyCount="replyCount"
+        @close="ReplyShow = $event"
+        :artId="$route.query.id"
+      ></PopReply>
     </van-list>
   </div>
 </template>
 
 <script>
 import CommentItem from './commentItem.vue'
-// import eventBus from './EventBus'
+import PopReply from './popReply.vue'
+import eventBus from './EventBus'
 // import dayjs from '@/utils/dayjs'
 import { getComments } from '@/api'
 export default {
   data() {
     return {
       getCommentsList: [], // 评论列表的数据
+      getReplyList: [],
       flag: false, // 进入页面会直接请求两次数据的问题
       loading: false, // 加载中，请求完成渲染好一次数据，会自动变为true
       finished: false, // 表示是否结束列表
-      last: '' // 每次请求评论列表得到的最后一个值
+      last: '', // 每次请求评论列表得到的最后一个值
+      ReplyShow: false,
+      ReplyIndex: 0,
+      end: '',
+      replyCount: 0
     }
   },
   props: {
@@ -39,12 +56,26 @@ export default {
     }
   },
   components: {
-    CommentItem
+    CommentItem,
+    PopReply
   },
-  created() {
-    this.getComment()
+  async created() {
+    const res = await this.getComment()
+    this.getCommentsList = [...this.getCommentsList, ...res]
+
+    eventBus.$on('send', (getReleaseList) => {
+      this.getCommentsList.unshift(getReleaseList)
+    })
   },
   methods: {
+    // 子传父
+    popFn(isReplyShow, ind, getReplyList, replyCount) {
+      this.ReplyShow = isReplyShow
+      this.ReplyIndex = ind
+      this.getReplyList = getReplyList
+      this.replyCount = replyCount
+      // console.log(this.getReplyList, 0)
+    },
     // 获取评论列表
     async getComment() {
       try {
@@ -54,14 +85,12 @@ export default {
           type: 'a',
           source: this.$route.query.id,
           offset: this.last,
-          limit: 5
+          limit: 10
         })
         this.last = res.data.data.last_id
-        console.log(this.last)
+        this.end = res.data.data.end_id
+        // console.log(this.last)
         // console.log(res)
-        // this.getCommentsList = res.data.data.results
-        // console.log(this.getCommentsList)
-        // this.numReply = res.data.data.total_count
         return res.data.data.results
       } catch (err) {
         console.log(err)
@@ -70,13 +99,13 @@ export default {
     // 滚动条触底后自动触发的，重新获取新的数据
     async onLoad() {
       const res = await this.getComment()
-      if (!this.last) {
+      this.getCommentsList = [...this.getCommentsList, ...res]
+      if (!this.end) {
         this.finished = true
         this.loading = false
         return
       }
-      this.getCommentsList = [...this.getCommentsList, ...res]
-      // console.log(this.getCommentsList)
+      console.log(this.getCommentsList, 2)
       this.loading = false
     }
   }

@@ -98,12 +98,6 @@ export default {
       numReply: 0
     }
   },
-  // created() {
-  //   eventBus.$on('sendNum', (numReply) => {
-  //     // console.log(numReply + '真的')
-  //     this.numReply = numReply
-  //   })
-  // },
   methods: {
     // 写评论留言
     leaveWordFn() {
@@ -120,12 +114,12 @@ export default {
           content: this.message
         })
         this.getReleaseList = res.data.data.new_obj
-        console.log(this.getReleaseList)
+        eventBus.$emit('send', this.getReleaseList)
+        console.log(this.getReleaseList, 1)
+
         this.showLeave = false
         this.message = ''
-        // 跨组件传值，发送方
-        eventBus.$emit('send', this.getReleaseList)
-        this.$toast.success('发布成功')
+
         // 用了非法的方式，直接改变了父组件传的值
         this.getArticleInfoList.comm_count =
           this.getArticleInfoList.comm_count + 1
